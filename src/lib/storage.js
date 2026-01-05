@@ -1,10 +1,37 @@
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from "fs";
 import { join } from "path";
-import { DATA_DIR } from "./constants.js";
+import crypto from "crypto";
+import { DATA_DIR, ADMIN_PASSWORD } from "./constants.js";
 
 const dataDir = join(process.cwd(), DATA_DIR);
-const tokensFile = join(dataDir, "tokens.json");
+const tokensFile = join(dataDir, "tokens.enc"); // Changed extension
 const settingsFile = join(dataDir, "settings.json");
+
+const ALGORITHM = "aes-256-cbc";
+const KEY = crypto.scryptSync(ADMIN_PASSWORD, "ai-monitor-salt", 32);
+const IV_LENGTH = 16;
+
+function encrypt(text) {
+  const iv = crypto.randomBytes(IV_LENGTH);
+  const cipher = crypto.createCipheriv(ALGORITHM, KEY, iv);
+  let encrypted = cipher.update(text, "utf8", "hex");
+  encrypted += cipher.final("hex");
+  return iv.toString("hex") + ":" + encrypted;
+}
+
+function decrypt(text) {
+  try {
+    const textParts = text.split(":");
+    const iv = Buffer.from(textParts.shift(), "hex");
+    const encryptedText = Buffer.from(textParts.join(":"), "hex");
+    const decipher = crypto.createDecipheriv(ALGORITHM, KEY, iv);
+    let decrypted = decipher.update(encryptedText, "hex", "utf8");
+    decrypted += decipher.final("utf8");
+    return decrypted;
+  } catch (e) {
+    return null;
+  }
+}
 
 function ensureDataDir() {
   if (!existsSync(dataDir)) {
@@ -28,56 +55,86 @@ function writeJson(filePath, data) {
   writeFileSync(filePath, JSON.stringify(data, null, 2), "utf-8");
 }
 
+// Helper for encrypted tokens
+function readTokens() {
+  try {
+    if (existsSync(tokensFile)) {
+      const encrypted = readFileSync(tokensFile, "utf-8");
+      const decrypted = decrypt(encrypted);
+      return decrypted ? JSON.parse(decrypted) : {};
+    }
+    // Migration check for old tokens.json
+    const oldFile = join(dataDir, "tokens.json");
+    const oldSettingsFile = join(dataDir, "settings.json");
+    if (existsSync(oldFile) || existsSync(oldSettingsFile)) {
+      const tokensData = existsSync(oldFile) ? JSON.parse(readFileSync(oldFile, "utf-8")) : {};
+      const settingsData = existsSync(oldSettingsFile) ? JSON.parse(readFileSync(oldSettingsFile, "utf-8")) : {};
+      const merged = { ...tokensData, ...settingsData };
+      saveTokens(merged);
+      return merged;
+    }
+  } catch (e) {
+    console.error(`Error reading tokens:`, e.message);
+  }
+  return {};
+}
+
+function saveTokens(data) {
+  ensureDataDir();
+  const encrypted = encrypt(JSON.stringify(data));
+  writeFileSync(tokensFile, encrypted, "utf-8");
+}
+
 // Antigravity tokens
 export function getAntigravityTokens() {
-  const data = readJson(tokensFile);
+  const data = readTokens();
   return data.antigravity || null;
 }
 
 export function saveAntigravityTokens(tokens) {
-  const data = readJson(tokensFile);
+  const data = readTokens();
   data.antigravity = tokens;
-  writeJson(tokensFile, data);
+  saveTokens(data);
 }
 
 export function clearAntigravityTokens() {
-  const data = readJson(tokensFile);
+  const data = readTokens();
   delete data.antigravity;
-  writeJson(tokensFile, data);
+  saveTokens(data);
 }
 
 // GLM settings
 export function getGlmSettings() {
-  const data = readJson(settingsFile);
+  const data = readTokens();
   return data.glm || null;
 }
 
 export function saveGlmSettings(settings) {
-  const data = readJson(settingsFile);
+  const data = readTokens();
   data.glm = settings;
-  writeJson(settingsFile, data);
+  saveTokens(data);
 }
 
 export function clearGlmSettings() {
-  const data = readJson(settingsFile);
+  const data = readTokens();
   delete data.glm;
-  writeJson(settingsFile, data);
+  saveTokens(data);
 }
 
 // OpenAI tokens
 export function getOpenaiTokens() {
-  const data = readJson(tokensFile);
+  const data = readTokens();
   return data.openai || null;
 }
 
 export function saveOpenaiTokens(tokens) {
-  const data = readJson(tokensFile);
+  const data = readTokens();
   data.openai = tokens;
-  writeJson(tokensFile, data);
+  saveTokens(data);
 }
 
 export function clearOpenaiTokens() {
-  const data = readJson(tokensFile);
+  const data = readTokens();
   delete data.openai;
-  writeJson(tokensFile, data);
+  saveTokens(data);
 }

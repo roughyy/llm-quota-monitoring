@@ -34,3 +34,4 @@ export const OPENAI_WHAM_URL = "https://chatgpt.com/backend-api/wham/usage";
 // Server Config
 export const PORT = process.env.PORT || 3000;
 export const DATA_DIR = process.env.DATA_DIR || ".data";
+export const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "admin"; // Default password for setup

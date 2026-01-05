@@ -1,8 +1,9 @@
 import { Hono } from "hono";
 import { serve } from "@hono/node-server";
 import { serveStatic } from "@hono/node-server/serve-static";
+import { basicAuth } from "hono/basic-auth";
 
-import { PORT } from "./lib/constants.js";
+import { PORT, ADMIN_PASSWORD } from "./lib/constants.js";
 import {
   createAuthorizationUrl,
   exchangeCodeForTokens,
@@ -24,6 +25,12 @@ import { renderDashboard, renderSettings, renderQuotaCard } from "./views/templa
 
 const app = new Hono();
 
+// Auth Middleware for settings and modifications
+const auth = basicAuth({
+  username: "admin",
+  password: ADMIN_PASSWORD,
+});
+
 // Serve static files
 app.use("/public/*", serveStatic({ root: "./" }));
 
@@ -36,7 +43,7 @@ app.get("/", async (c) => {
 });
 
 // Settings page
-app.get("/settings", (c) => {
+app.get("/settings", auth, (c) => {
   const glmSettings = getGlmSettings();
   const openaiTokens = getOpenaiTokens();
   return c.html(renderSettings(glmSettings, openaiTokens));
@@ -45,7 +52,7 @@ app.get("/settings", (c) => {
 // ============ Auth Routes ============
 
 // Initiate Google OAuth
-app.get("/auth/google", (c) => {
+app.get("/auth/google", auth, (c) => {
   const { url } = createAuthorizationUrl();
   return c.redirect(url);
 });
@@ -108,7 +115,7 @@ app.get("/auth/google/callback", async (c) => {
 });
 
 // Logout Antigravity
-app.post("/auth/google/logout", (c) => {
+app.post("/auth/google/logout", auth, (c) => {
   clearAntigravityTokens();
   return c.redirect("/");
 });
@@ -154,7 +161,7 @@ app.get("/partials/openai-quota", async (c) => {
 // ============ Settings Routes ============
 
 // Save GLM settings
-app.post("/settings/glm", async (c) => {
+app.post("/settings/glm", auth, async (c) => {
   const body = await c.req.parseBody();
   const apiKey = body.apiKey?.toString().trim();
   const baseUrl = body.baseUrl?.toString().trim();
@@ -172,13 +179,13 @@ app.post("/settings/glm", async (c) => {
 });
 
 // Clear GLM settings
-app.post("/settings/glm/clear", (c) => {
+app.post("/settings/glm/clear", auth, (c) => {
   clearGlmSettings();
   return c.redirect("/settings");
 });
 
 // Save OpenAI settings
-app.post("/settings/openai", async (c) => {
+app.post("/settings/openai", auth, async (c) => {
   const body = await c.req.parseBody();
   const accessToken = body.accessToken?.toString().trim();
 
@@ -195,7 +202,7 @@ app.post("/settings/openai", async (c) => {
 });
 
 // Clear OpenAI settings
-app.post("/settings/openai/clear", (c) => {
+app.post("/settings/openai/clear", auth, (c) => {
   clearOpenaiTokens();
   return c.redirect("/settings");
 });

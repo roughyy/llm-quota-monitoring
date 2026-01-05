@@ -74,6 +74,13 @@ const getProgressColor = (percentage) => {
   return "bg-rose-500 shadow-[0_0_10px_rgba(244,63,94,0.5)]";
 };
 
+const maskEmail = (email) => {
+  if (!email) return 'UNKNOWN_USER';
+  const [name, domain] = email.split('@');
+  if (!domain) return email;
+  return `${name[0]}***@${domain}`;
+};
+
 export function renderDashboard(antigravityTokens, glmSettings, openaiTokens) {
   const content = `
     <header class="mb-12 flex items-end justify-between">
@@ -101,11 +108,12 @@ export function renderDashboard(antigravityTokens, glmSettings, openaiTokens) {
             </div>
             <div class="text-right">
               ${antigravityTokens ? 
-                `<div class="flex items-center gap-2 justify-end text-teal-400 mb-1">
+                `                 <div class="flex items-center gap-2 justify-end text-teal-400 mb-1">
                    <div class="w-1.5 h-1.5 bg-current rounded-full"></div>
                    <span class="text-[10px] font-bold uppercase tracking-wider">Connected</span>
                  </div>
-                 <div class="text-[10px] text-zinc-500 font-mono border-t border-zinc-800 pt-1 mt-1">${antigravityTokens.email}</div>` : 
+                 <div class="text-[10px] text-zinc-500 font-mono border-t border-zinc-800 pt-1 mt-1">${maskEmail(antigravityTokens.email)}</div>` : 
+ 
                 `<a href="/auth/google" class="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest bg-zinc-100 text-zinc-900 px-4 py-2 rounded hover:bg-teal-400 hover:text-zinc-900 transition-colors">
                    <span>Link Account</span>
                    <span>→</span>
@@ -130,7 +138,7 @@ export function renderDashboard(antigravityTokens, glmSettings, openaiTokens) {
 
           ${antigravityTokens ? `
           <div class="mt-8 pt-6 border-t border-zinc-800/50 relative z-10 flex justify-between items-center">
-             <span class="text-[10px] text-zinc-600">ID: ${antigravityTokens.projectId || 'UNKNOWN'}</span>
+             <span class="text-[10px] text-zinc-600">ID: ${antigravityTokens.projectId ? antigravityTokens.projectId.slice(0, 4) + '...' : 'UNKNOWN'}</span>
              <form action="/auth/google/logout" method="POST">
                <button type="submit" class="text-[10px] text-zinc-500 hover:text-rose-400 font-bold uppercase tracking-widest transition-colors flex items-center gap-2">
                  <span>Term</span>
