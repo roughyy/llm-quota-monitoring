@@ -1,8 +1,13 @@
-// Google Antigravity OAuth Config (from AntigravityQuotaWatcher)
+// Server Config
+export const PORT = process.env.PORT || 3000;
+export const BASE_URL = process.env.BASE_URL || `http://localhost:${PORT}`;
+export const DATA_DIR = process.env.DATA_DIR || ".data";
+export const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "admin"; // Default password for setup
+
+// Google Antigravity OAuth Config
 export const ANTIGRAVITY_CLIENT_ID = "1071006060591-tmhssin2h21lcre235vtolojh4g403ep.apps.googleusercontent.com";
 export const ANTIGRAVITY_CLIENT_SECRET = "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";
-export const ANTIGRAVITY_CALLBACK_PORT = 3000;
-export const ANTIGRAVITY_REDIRECT_URI = `http://localhost:${ANTIGRAVITY_CALLBACK_PORT}/auth/google/callback`;
+export const ANTIGRAVITY_REDIRECT_URI = `${BASE_URL}/auth/google/callback`;
 
 export const ANTIGRAVITY_SCOPES = [
   "https://www.googleapis.com/auth/cloud-platform",
@@ -30,8 +35,3 @@ export const GLM_BASE_URLS = {
 
 // OpenAI ChatGPT Config
 export const OPENAI_WHAM_URL = "https://chatgpt.com/backend-api/wham/usage";
-
-// Server Config
-export const PORT = process.env.PORT || 3000;
-export const DATA_DIR = process.env.DATA_DIR || ".data";
-export const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "admin"; // Default password for setup

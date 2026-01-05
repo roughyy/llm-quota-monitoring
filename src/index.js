@@ -3,7 +3,7 @@ import { serve } from "@hono/node-server";
 import { serveStatic } from "@hono/node-server/serve-static";
 import { basicAuth } from "hono/basic-auth";
 
-import { PORT, ADMIN_PASSWORD } from "./lib/constants.js";
+import { PORT, ADMIN_PASSWORD, BASE_URL } from "./lib/constants.js";
 import {
   createAuthorizationUrl,
   exchangeCodeForTokens,
@@ -208,7 +208,7 @@ app.post("/settings/openai/clear", auth, (c) => {
 });
 
 // Start server
-console.log(`🚀 AI Quota Monitor running at http://localhost:${PORT}`);
+console.log(`🚀 AI Quota Monitor running at ${BASE_URL}`);
 serve({
   fetch: app.fetch,
   port: PORT,
