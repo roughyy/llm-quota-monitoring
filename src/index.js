@@ -9,12 +9,16 @@ import {
 } from "./lib/antigravity-auth.js";
 import { fetchAntigravityQuota } from "./lib/antigravity-quota.js";
 import { fetchGlmQuota } from "./lib/glm-quota.js";
+import { fetchOpenaiQuota } from "./lib/openai-quota.js";
 import {
   getAntigravityTokens,
   clearAntigravityTokens,
   getGlmSettings,
   saveGlmSettings,
   clearGlmSettings,
+  getOpenaiTokens,
+  saveOpenaiTokens,
+  clearOpenaiTokens,
 } from "./lib/storage.js";
 import { renderDashboard, renderSettings, renderQuotaCard } from "./views/templates.js";
 
@@ -27,13 +31,15 @@ app.use("/public/*", serveStatic({ root: "./" }));
 app.get("/", async (c) => {
   const antigravityTokens = getAntigravityTokens();
   const glmSettings = getGlmSettings();
-  return c.html(renderDashboard(antigravityTokens, glmSettings));
+  const openaiTokens = getOpenaiTokens();
+  return c.html(renderDashboard(antigravityTokens, glmSettings, openaiTokens));
 });
 
 // Settings page
 app.get("/settings", (c) => {
   const glmSettings = getGlmSettings();
-  return c.html(renderSettings(glmSettings));
+  const openaiTokens = getOpenaiTokens();
+  return c.html(renderSettings(glmSettings, openaiTokens));
 });
 
 // ============ Auth Routes ============
@@ -121,6 +127,12 @@ app.get("/api/glm/quota", async (c) => {
   return c.json(quota);
 });
 
+// Fetch OpenAI quota
+app.get("/api/openai/quota", async (c) => {
+  const quota = await fetchOpenaiQuota();
+  return c.json(quota);
+});
+
 // HTMX partial: Antigravity quota card
 app.get("/partials/antigravity-quota", async (c) => {
   const quota = await fetchAntigravityQuota();
@@ -131,6 +143,12 @@ app.get("/partials/antigravity-quota", async (c) => {
 app.get("/partials/glm-quota", async (c) => {
   const quota = await fetchGlmQuota();
   return c.html(renderQuotaCard("glm", quota));
+});
+
+// HTMX partial: OpenAI quota card
+app.get("/partials/openai-quota", async (c) => {
+  const quota = await fetchOpenaiQuota();
+  return c.html(renderQuotaCard("openai", quota));
 });
 
 // ============ Settings Routes ============
@@ -156,6 +174,29 @@ app.post("/settings/glm", async (c) => {
 // Clear GLM settings
 app.post("/settings/glm/clear", (c) => {
   clearGlmSettings();
+  return c.redirect("/settings");
+});
+
+// Save OpenAI settings
+app.post("/settings/openai", async (c) => {
+  const body = await c.req.parseBody();
+  const accessToken = body.accessToken?.toString().trim();
+
+  if (!accessToken) {
+    return c.html(`
+      <div class="text-red-500 text-sm mt-2">
+        Access Token is required.
+      </div>
+    `);
+  }
+
+  saveOpenaiTokens({ accessToken, lastChecked: new Date().toISOString() });
+  return c.redirect("/");
+});
+
+// Clear OpenAI settings
+app.post("/settings/openai/clear", (c) => {
+  clearOpenaiTokens();
   return c.redirect("/settings");
 });
 

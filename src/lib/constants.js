@@ -28,6 +28,9 @@ export const GLM_BASE_URLS = {
   ZHIPU: "https://open.bigmodel.cn",
 };
 
+// OpenAI ChatGPT Config
+export const OPENAI_WHAM_URL = "https://chatgpt.com/backend-api/wham/usage";
+
 // Server Config
 export const PORT = process.env.PORT || 3000;
 export const DATA_DIR = process.env.DATA_DIR || ".data";

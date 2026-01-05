@@ -63,3 +63,21 @@ export function clearGlmSettings() {
   delete data.glm;
   writeJson(settingsFile, data);
 }
+
+// OpenAI tokens
+export function getOpenaiTokens() {
+  const data = readJson(tokensFile);
+  return data.openai || null;
+}
+
+export function saveOpenaiTokens(tokens) {
+  const data = readJson(tokensFile);
+  data.openai = tokens;
+  writeJson(tokensFile, data);
+}
+
+export function clearOpenaiTokens() {
+  const data = readJson(tokensFile);
+  delete data.openai;
+  writeJson(tokensFile, data);
+}
