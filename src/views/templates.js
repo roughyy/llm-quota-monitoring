@@ -82,6 +82,144 @@ const maskEmail = (email) => {
 };
 
 export function renderDashboard(antigravityTokens, glmSettings, openaiTokens) {
+  const sections = [];
+
+  if (antigravityTokens) {
+    sections.push(`
+      <!-- Antigravity Section -->
+      <section class="glass-panel rounded-lg p-1 transition-all duration-300 hover:border-zinc-700 group">
+        <div class="bg-zinc-900/50 rounded p-6 h-full relative overflow-hidden">
+          <div class="flex items-start justify-between mb-8 relative z-10">
+            <div>
+              <div class="flex items-center gap-2 mb-2">
+                 <span class="text-[10px] font-bold bg-zinc-800 text-zinc-400 px-2 py-0.5 rounded uppercase tracking-wider">Source_01</span>
+              </div>
+              <h2 class="text-xl font-bold text-zinc-100">Google Antigravity</h2>
+            </div>
+            <div class="text-right">
+              <div class="flex items-center gap-2 justify-end text-teal-400 mb-1">
+                <div class="w-1.5 h-1.5 bg-current rounded-full"></div>
+                <span class="text-[10px] font-bold uppercase tracking-wider">Connected</span>
+              </div>
+              <div class="text-[10px] text-zinc-500 font-mono border-t border-zinc-800 pt-1 mt-1">${maskEmail(antigravityTokens.email)}</div>
+            </div>
+          </div>
+          
+          <div 
+            id="antigravity-quota"
+            hx-get="/partials/antigravity-quota"
+            hx-trigger="load, every 60s"
+            hx-swap="innerHTML"
+            class="relative z-10 min-h-[200px]"
+          >
+            <div class="flex items-center justify-center h-40 text-xs text-zinc-600 animate-pulse font-mono">INITIALIZING_DATA_STREAM...</div>
+          </div>
+
+          <div class="mt-8 pt-6 border-t border-zinc-800/50 relative z-10 flex justify-between items-center">
+             <span class="text-[10px] text-zinc-600">ID: ${antigravityTokens.projectId ? antigravityTokens.projectId.slice(0, 4) + '...' : 'UNKNOWN'}</span>
+             <form action="/auth/google/logout" method="POST">
+               <button type="submit" class="text-[10px] text-zinc-500 hover:text-rose-400 font-bold uppercase tracking-widest transition-colors flex items-center gap-2">
+                 <span>Term</span>
+                 <span class="text-[8px] border border-current px-1 rounded">ESC</span>
+               </button>
+             </form>
+          </div>
+          
+          <div class="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 blur-[80px] rounded-full pointer-events-none group-hover:bg-blue-500/10 transition-colors duration-500"></div>
+        </div>
+      </section>
+    `);
+  }
+
+  if (openaiTokens) {
+    sections.push(`
+      <!-- OpenAI Section -->
+      <section class="glass-panel rounded-lg p-1 transition-all duration-300 hover:border-zinc-700 group">
+        <div class="bg-zinc-900/50 rounded p-6 h-full relative overflow-hidden">
+          <div class="flex items-start justify-between mb-8 relative z-10">
+            <div>
+              <div class="flex items-center gap-2 mb-2">
+                 <span class="text-[10px] font-bold bg-emerald-900/50 text-emerald-400 px-2 py-0.5 rounded uppercase tracking-wider border border-emerald-500/20">Source_02</span>
+              </div>
+              <h2 class="text-xl font-bold text-zinc-100">ChatGPT Plus</h2>
+            </div>
+            <div class="text-right">
+              <div class="flex items-center gap-2 justify-end text-emerald-400 mb-1">
+                 <div class="w-1.5 h-1.5 bg-current rounded-full animate-pulse"></div>
+                 <span class="text-[10px] font-bold uppercase tracking-wider">Session Active</span>
+              </div>
+              <div class="text-[10px] text-zinc-500 font-mono border-t border-zinc-800 pt-1 mt-1">OPENAI_WHAM_v1</div>
+            </div>
+          </div>
+
+          <div 
+            id="openai-quota"
+            hx-get="/partials/openai-quota"
+            hx-trigger="load, every 60s"
+            hx-swap="innerHTML"
+            class="relative z-10 min-h-[200px]"
+          >
+            <div class="flex items-center justify-center h-40 text-xs text-zinc-600 animate-pulse font-mono">ESTABLISHING_ENCRYPTED_LINK...</div>
+          </div>
+          
+          <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 blur-[80px] rounded-full pointer-events-none group-hover:bg-emerald-500/10 transition-colors duration-500"></div>
+        </div>
+      </section>
+    `);
+  }
+
+  if (glmSettings) {
+    sections.push(`
+      <!-- GLM Section -->
+      <section class="glass-panel rounded-lg p-1 transition-all duration-300 hover:border-zinc-700 group ${sections.length % 2 === 0 && sections.length > 0 ? 'lg:col-span-2' : ''}">
+        <div class="bg-zinc-900/50 rounded p-6 h-full relative overflow-hidden">
+          <div class="flex items-start justify-between mb-8 relative z-10">
+            <div>
+              <div class="flex items-center gap-2 mb-2">
+                 <span class="text-[10px] font-bold bg-zinc-800 text-zinc-400 px-2 py-0.5 rounded uppercase tracking-wider">Source_03</span>
+              </div>
+              <h2 class="text-xl font-bold text-zinc-100">GLM Coding Plan</h2>
+            </div>
+            <div class="text-right">
+              <div class="flex items-center gap-2 justify-end text-teal-400 mb-1">
+                 <div class="w-1.5 h-1.5 bg-current rounded-full"></div>
+                 <span class="text-[10px] font-bold uppercase tracking-wider">Active</span>
+              </div>
+              <div class="text-[10px] text-zinc-500 font-mono border-t border-zinc-800 pt-1 mt-1">${glmSettings.baseUrl.includes('z.ai') ? 'Z.AI NETWORK' : 'ZHIPU NETWORK'}</div>
+            </div>
+          </div>
+
+          <div 
+            id="glm-quota"
+            hx-get="/partials/glm-quota"
+            hx-trigger="load, every 60s"
+            hx-swap="innerHTML"
+            class="relative z-10 min-h-[200px]"
+          >
+            <div class="flex items-center justify-center h-40 text-xs text-zinc-600 animate-pulse font-mono">INITIALIZING_DATA_STREAM...</div>
+          </div>
+          
+          <div class="absolute top-0 right-0 w-32 h-32 bg-purple-500/5 blur-[80px] rounded-full pointer-events-none group-hover:bg-purple-500/10 transition-colors duration-500"></div>
+        </div>
+      </section>
+    `);
+  }
+
+  const gridContent = sections.length > 0 
+    ? `<div class="grid grid-cols-1 ${sections.length > 1 ? 'lg:grid-cols-2' : ''} gap-8 items-start">${sections.join('')}</div>`
+    : `
+      <div class="flex flex-col items-center justify-center py-20 border border-dashed border-zinc-800 rounded-lg bg-zinc-900/20">
+        <div class="w-12 h-12 bg-zinc-800 rounded-full flex items-center justify-center mb-6">
+          <span class="text-2xl">⚡</span>
+        </div>
+        <h2 class="text-xl font-bold text-zinc-100 mb-2 uppercase tracking-tight">System Initialization Required</h2>
+        <p class="text-zinc-500 text-sm mb-8 text-center max-w-md">No active resource streams detected. Configure your API endpoints or link your accounts to begin monitoring.</p>
+        <a href="/settings" class="bg-zinc-100 text-zinc-900 px-8 py-3 text-[10px] font-bold uppercase tracking-widest hover:bg-teal-400 hover:text-zinc-900 transition-colors rounded-sm shadow-xl shadow-zinc-100/5">
+          Go to Configuration Console
+        </a>
+      </div>
+    `;
+
   const content = `
     <header class="mb-12 flex items-end justify-between">
       <div>
@@ -94,155 +232,7 @@ export function renderDashboard(antigravityTokens, glmSettings, openaiTokens) {
       </div>
     </header>
 
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-      <!-- Antigravity Section -->
-      <section class="glass-panel rounded-lg p-1 transition-all duration-300 hover:border-zinc-700 group">
-        <div class="bg-zinc-900/50 rounded p-6 h-full relative overflow-hidden">
-          <!-- Header -->
-          <div class="flex items-start justify-between mb-8 relative z-10">
-            <div>
-              <div class="flex items-center gap-2 mb-2">
-                 <span class="text-[10px] font-bold bg-zinc-800 text-zinc-400 px-2 py-0.5 rounded uppercase tracking-wider">Source_01</span>
-              </div>
-              <h2 class="text-xl font-bold text-zinc-100">Google Antigravity</h2>
-            </div>
-            <div class="text-right">
-              ${antigravityTokens ? 
-                `                 <div class="flex items-center gap-2 justify-end text-teal-400 mb-1">
-                   <div class="w-1.5 h-1.5 bg-current rounded-full"></div>
-                   <span class="text-[10px] font-bold uppercase tracking-wider">Connected</span>
-                 </div>
-                 <div class="text-[10px] text-zinc-500 font-mono border-t border-zinc-800 pt-1 mt-1">${maskEmail(antigravityTokens.email)}</div>` : 
- 
-                `<a href="/auth/google" class="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest bg-zinc-100 text-zinc-900 px-4 py-2 rounded hover:bg-teal-400 hover:text-zinc-900 transition-colors">
-                   <span>Link Account</span>
-                   <span>→</span>
-                 </a>`
-              }
-            </div>
-          </div>
-          
-          <!-- Content -->
-          <div 
-            id="antigravity-quota"
-            hx-get="/partials/antigravity-quota"
-            hx-trigger="load, every 60s"
-            hx-swap="innerHTML"
-            class="relative z-10 min-h-[200px]"
-          >
-            ${antigravityTokens ? 
-              '<div class="flex items-center justify-center h-40 text-xs text-zinc-600 animate-pulse font-mono">INITIALIZING_DATA_STREAM...</div>' : 
-              '<div class="flex flex-col items-center justify-center h-40 border border-dashed border-zinc-800 rounded bg-zinc-900/30"><span class="text-zinc-600 text-xs mb-2">NO SIGNAL</span><span class="text-[10px] text-zinc-700 uppercase tracking-widest">Authentication Required</span></div>'
-            }
-          </div>
-
-          ${antigravityTokens ? `
-          <div class="mt-8 pt-6 border-t border-zinc-800/50 relative z-10 flex justify-between items-center">
-             <span class="text-[10px] text-zinc-600">ID: ${antigravityTokens.projectId ? antigravityTokens.projectId.slice(0, 4) + '...' : 'UNKNOWN'}</span>
-             <form action="/auth/google/logout" method="POST">
-               <button type="submit" class="text-[10px] text-zinc-500 hover:text-rose-400 font-bold uppercase tracking-widest transition-colors flex items-center gap-2">
-                 <span>Term</span>
-                 <span class="text-[8px] border border-current px-1 rounded">ESC</span>
-               </button>
-             </form>
-          </div>
-          ` : ""}
-          
-          <!-- Decorative BG -->
-          <div class="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 blur-[80px] rounded-full pointer-events-none group-hover:bg-blue-500/10 transition-colors duration-500"></div>
-        </div>
-      </section>
-
-      <!-- OpenAI Section -->
-      <section class="glass-panel rounded-lg p-1 transition-all duration-300 hover:border-zinc-700 group">
-        <div class="bg-zinc-900/50 rounded p-6 h-full relative overflow-hidden">
-          <!-- Header -->
-          <div class="flex items-start justify-between mb-8 relative z-10">
-            <div>
-              <div class="flex items-center gap-2 mb-2">
-                 <span class="text-[10px] font-bold bg-emerald-900/50 text-emerald-400 px-2 py-0.5 rounded uppercase tracking-wider border border-emerald-500/20">Source_02</span>
-              </div>
-              <h2 class="text-xl font-bold text-zinc-100">ChatGPT Plus</h2>
-            </div>
-            <div class="text-right">
-              ${openaiTokens ? 
-                `<div class="flex items-center gap-2 justify-end text-emerald-400 mb-1">
-                   <div class="w-1.5 h-1.5 bg-current rounded-full animate-pulse"></div>
-                   <span class="text-[10px] font-bold uppercase tracking-wider">Session Active</span>
-                 </div>
-                 <div class="text-[10px] text-zinc-500 font-mono border-t border-zinc-800 pt-1 mt-1">OPENAI_WHAM_v1</div>` : 
-                `<a href="/settings" class="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest bg-zinc-100 text-zinc-900 px-4 py-2 rounded hover:bg-emerald-400 hover:text-zinc-900 transition-colors">
-                   <span>Secure Login</span>
-                   <span>→</span>
-                 </a>`
-              }
-            </div>
-          </div>
-
-          <!-- Content -->
-          <div 
-            id="openai-quota"
-            hx-get="/partials/openai-quota"
-            hx-trigger="load, every 60s"
-            hx-swap="innerHTML"
-            class="relative z-10 min-h-[200px]"
-          >
-            ${openaiTokens ? 
-              '<div class="flex items-center justify-center h-40 text-xs text-zinc-600 animate-pulse font-mono">ESTABLISHING_ENCRYPTED_LINK...</div>' : 
-              '<div class="flex flex-col items-center justify-center h-40 border border-dashed border-zinc-800 rounded bg-zinc-900/30"><span class="text-zinc-600 text-xs mb-2">LINK_OFFLINE</span><span class="text-[10px] text-zinc-700 uppercase tracking-widest">Session Token Required</span></div>'
-            }
-          </div>
-          
-          <!-- Decorative BG -->
-          <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 blur-[80px] rounded-full pointer-events-none group-hover:bg-emerald-500/10 transition-colors duration-500"></div>
-        </div>
-      </section>
-
-      <!-- GLM Section -->
-      <section class="glass-panel rounded-lg p-1 transition-all duration-300 hover:border-zinc-700 group lg:col-span-2">
-        <div class="bg-zinc-900/50 rounded p-6 h-full relative overflow-hidden">
-          <!-- Header -->
-          <div class="flex items-start justify-between mb-8 relative z-10">
-            <div>
-              <div class="flex items-center gap-2 mb-2">
-                 <span class="text-[10px] font-bold bg-zinc-800 text-zinc-400 px-2 py-0.5 rounded uppercase tracking-wider">Source_03</span>
-              </div>
-              <h2 class="text-xl font-bold text-zinc-100">GLM Coding Plan</h2>
-            </div>
-            <div class="text-right">
-              ${glmSettings ? 
-                `<div class="flex items-center gap-2 justify-end text-teal-400 mb-1">
-                   <div class="w-1.5 h-1.5 bg-current rounded-full"></div>
-                   <span class="text-[10px] font-bold uppercase tracking-wider">Active</span>
-                 </div>
-                 <div class="text-[10px] text-zinc-500 font-mono border-t border-zinc-800 pt-1 mt-1">${glmSettings.baseUrl.includes('z.ai') ? 'Z.AI NETWORK' : 'ZHIPU NETWORK'}</div>` : 
-                `<a href="/settings" class="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest bg-zinc-100 text-zinc-900 px-4 py-2 rounded hover:bg-teal-400 hover:text-zinc-900 transition-colors">
-                   <span>Configure</span>
-                   <span>→</span>
-                 </a>`
-              }
-            </div>
-          </div>
-
-          <!-- Content -->
-          <div 
-            id="glm-quota"
-            hx-get="/partials/glm-quota"
-            hx-trigger="load, every 60s"
-            hx-swap="innerHTML"
-            class="relative z-10 min-h-[200px]"
-          >
-            ${glmSettings ? 
-              '<div class="flex items-center justify-center h-40 text-xs text-zinc-600 animate-pulse font-mono">INITIALIZING_DATA_STREAM...</div>' : 
-              '<div class="flex flex-col items-center justify-center h-40 border border-dashed border-zinc-800 rounded bg-zinc-900/30"><span class="text-zinc-600 text-xs mb-2">NO CONFIG</span><span class="text-[10px] text-zinc-700 uppercase tracking-widest">API Key Required</span></div>'
-            }
-          </div>
-          
-          <!-- Decorative BG -->
-          <div class="absolute top-0 right-0 w-32 h-32 bg-purple-500/5 blur-[80px] rounded-full pointer-events-none group-hover:bg-purple-500/10 transition-colors duration-500"></div>
-        </div>
-      </section>
-    </div>
+    ${gridContent}
   `;
 
   return baseLayout("Dashboard", content);
