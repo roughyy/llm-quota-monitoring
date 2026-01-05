@@ -1,0 +1,24 @@
+{
+  "name": "antigravity-quota-monitoring",
+  "version": "1.0.0",
+  "description": "Antigravity Quota Monitoring Dashboard",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js"
+  },
+  "keywords": [
+    "ai",
+    "quota",
+    "monitor",
+    "antigravity",
+    "glm"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@hono/node-server": "^1.19.7",
+    "hono": "^4.11.3"
+  }
+}
