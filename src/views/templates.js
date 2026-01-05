@@ -220,7 +220,7 @@ export function renderDashboard(antigravityTokens, glmSettings, openaiTokens) {
       </div>
     `;
 
-  const content = `
+  const dashboardContent = `
     <header class="mb-12 flex items-end justify-between">
       <div>
         <h1 class="text-3xl font-bold text-zinc-100 tracking-tighter mb-2">SYSTEM_OVERVIEW</h1>
@@ -235,67 +235,41 @@ export function renderDashboard(antigravityTokens, glmSettings, openaiTokens) {
     ${gridContent}
   `;
 
-  return baseLayout("Dashboard", content);
+  return baseLayout("Dashboard", dashboardContent);
 }
 
 export function renderSettings(glmSettings, openaiTokens) {
+  const antigravityTokens = null; // We'll just show the link button if it's missing on dashboard
+  
   const content = `
     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-      <!-- GLM Config -->
+      <!-- Google Gemini / Antigravity Auth -->
       <div class="glass-panel p-1 rounded-lg">
         <div class="bg-zinc-900/80 rounded p-8 h-full">
           <header class="mb-8 border-b border-zinc-800 pb-6">
-            <h1 class="text-xl font-bold text-zinc-100 tracking-tight mb-2">GLM_CONSOLE</h1>
-            <p class="text-[11px] text-zinc-500 uppercase tracking-wider">Z.AI / ZHIPU API Configuration</p>
+            <h1 class="text-xl font-bold text-zinc-100 tracking-tight mb-2">GOOGLE_AUTH</h1>
+            <p class="text-[11px] text-zinc-500 uppercase tracking-wider">Antigravity / Gemini Cloud Connection</p>
           </header>
           
-          <form action="/settings/glm" method="POST" class="space-y-8">
-            <div class="space-y-2">
-              <label class="block text-[10px] font-bold uppercase tracking-widest text-zinc-400">Authentication Token</label>
-              <div class="relative group">
-                <input 
-                  type="password" 
-                  name="apiKey" 
-                  value="${glmSettings?.apiKey || ""}"
-                  placeholder="sk-..."
-                  class="w-full bg-black/40 border border-zinc-800 rounded px-4 py-3 text-xs font-mono text-zinc-200 focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500/20 transition-all placeholder:text-zinc-700"
-                />
-                <div class="absolute inset-y-0 right-3 flex items-center pointer-events-none">
-                  <div class="w-1.5 h-1.5 bg-zinc-700 rounded-full group-focus-within:bg-teal-500 transition-colors"></div>
-                </div>
-              </div>
-            </div>
+          <div class="space-y-6">
+            <p class="text-xs text-zinc-500 leading-relaxed uppercase tracking-wide">
+              Authorize this application to access your Google Cloud AI usage metrics. This uses official OAuth2 flows.
+            </p>
             
-            <div class="space-y-2">
-              <label class="block text-[10px] font-bold uppercase tracking-widest text-zinc-400">Gateway Endpoint</label>
-              <div class="relative">
-                <select 
-                  name="baseUrl"
-                  class="w-full bg-black/40 border border-zinc-800 rounded px-4 py-3 text-xs font-mono text-zinc-200 focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500/20 appearance-none transition-all cursor-pointer hover:border-zinc-700"
-                >
-                  <option value="https://api.z.ai/api/anthropic" ${glmSettings?.baseUrl?.includes("z.ai") ? "selected" : ""}>Z.AI (api.z.ai)</option>
-                  <option value="https://open.bigmodel.cn/api/anthropic" ${glmSettings?.baseUrl?.includes("bigmodel") ? "selected" : ""}>ZHIPU (open.bigmodel.cn)</option>
-                </select>
-                <div class="absolute inset-y-0 right-4 flex items-center pointer-events-none text-zinc-500 text-[10px]">▼</div>
-              </div>
+            <div class="pt-4">
+              <a href="/auth/google" class="inline-flex items-center gap-3 bg-zinc-100 text-zinc-900 px-6 py-3 text-[10px] font-bold uppercase tracking-widest hover:bg-teal-400 hover:text-zinc-900 transition-colors rounded-sm shadow-lg">
+                <span>Link Google Account</span>
+                <span class="text-lg">→</span>
+              </a>
             </div>
 
-            <div class="pt-6 flex items-center justify-between">
-              <button type="submit" class="bg-zinc-100 text-zinc-900 px-6 py-2.5 text-[10px] font-bold uppercase tracking-widest hover:bg-teal-400 hover:text-zinc-900 transition-colors shadow-lg shadow-zinc-100/10 hover:shadow-teal-400/20 rounded-sm">
-                Save GLM
-              </button>
-              ${glmSettings ? `
-              <button 
-                type="button"
-                hx-post="/settings/glm/clear"
-                hx-confirm="WARN: Verify reset action. Continue?"
-                class="text-[10px] font-bold text-zinc-600 hover:text-rose-500 uppercase tracking-widest transition-colors"
-              >
-                Reset
-              </button>
-              ` : ""}
+            <div class="mt-8 pt-6 border-t border-zinc-800/50">
+               <div class="flex items-center gap-2 text-[9px] text-zinc-600 uppercase tracking-widest">
+                  <div class="w-1 h-1 bg-zinc-600 rounded-full"></div>
+                  <span>Scoped Access: Cloud-Platform, Userinfo</span>
+               </div>
             </div>
-          </form>
+          </div>
         </div>
       </div>
 
@@ -329,11 +303,6 @@ export function renderSettings(glmSettings, openaiTokens) {
                     <li>Paste it above and save.</li>
                   </ol>
                 </div>
-                
-                <div class="text-[9px] text-zinc-600 flex items-center gap-2 px-2">
-                  <div class="w-1 h-1 bg-zinc-600 rounded-full"></div>
-                  <span>Alternative: Check Network tab for 'wham/usage' -> Authorization header</span>
-                </div>
               </div>
             </div>
 
@@ -349,6 +318,60 @@ export function renderSettings(glmSettings, openaiTokens) {
                 class="text-[10px] font-bold text-zinc-600 hover:text-rose-500 uppercase tracking-widest transition-colors"
               >
                 Disconnect
+              </button>
+              ` : ""}
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- GLM Config -->
+      <div class="glass-panel p-1 rounded-lg md:col-span-2">
+        <div class="bg-zinc-900/80 rounded p-8 h-full">
+          <header class="mb-8 border-b border-zinc-800 pb-6">
+            <h1 class="text-xl font-bold text-zinc-100 tracking-tight mb-2">GLM_CONSOLE</h1>
+            <p class="text-[11px] text-zinc-500 uppercase tracking-wider">Z.AI / ZHIPU API Configuration</p>
+          </header>
+          
+          <form action="/settings/glm" method="POST" class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="space-y-2">
+              <label class="block text-[10px] font-bold uppercase tracking-widest text-zinc-400">Authentication Token</label>
+              <div class="relative group">
+                <input 
+                  type="password" 
+                  name="apiKey" 
+                  value="${glmSettings?.apiKey || ""}"
+                  placeholder="sk-..."
+                  class="w-full bg-black/40 border border-zinc-800 rounded px-4 py-3 text-xs font-mono text-zinc-200 focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500/20 transition-all placeholder:text-zinc-700"
+                />
+              </div>
+            </div>
+            
+            <div class="space-y-2">
+              <label class="block text-[10px] font-bold uppercase tracking-widest text-zinc-400">Gateway Endpoint</label>
+              <div class="relative">
+                <select 
+                  name="baseUrl"
+                  class="w-full bg-black/40 border border-zinc-800 rounded px-4 py-3 text-xs font-mono text-zinc-200 focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500/20 appearance-none transition-all cursor-pointer hover:border-zinc-700"
+                >
+                  <option value="https://api.z.ai/api/anthropic" ${glmSettings?.baseUrl?.includes("z.ai") ? "selected" : ""}>Z.AI (api.z.ai)</option>
+                  <option value="https://open.bigmodel.cn/api/anthropic" ${glmSettings?.baseUrl?.includes("bigmodel") ? "selected" : ""}>ZHIPU (open.bigmodel.cn)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="md:col-span-2 pt-6 flex items-center justify-between">
+              <button type="submit" class="bg-zinc-100 text-zinc-900 px-6 py-2.5 text-[10px] font-bold uppercase tracking-widest hover:bg-teal-400 hover:text-zinc-900 transition-colors shadow-lg shadow-zinc-100/10 hover:shadow-teal-400/20 rounded-sm">
+                Save GLM Configuration
+              </button>
+              ${glmSettings ? `
+              <button 
+                type="button"
+                hx-post="/settings/glm/clear"
+                hx-confirm="WARN: Verify reset action. Continue?"
+                class="text-[10px] font-bold text-zinc-600 hover:text-rose-500 uppercase tracking-widest transition-colors"
+              >
+                Reset Defaults
               </button>
               ` : ""}
             </div>
