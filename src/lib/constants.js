@@ -5,8 +5,8 @@ export const DATA_DIR = process.env.DATA_DIR || ".data";
 export const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "admin"; // Default password for setup
 
 // Google Antigravity OAuth Config
-export const ANTIGRAVITY_CLIENT_ID = "1071006060591-tmhssin2h21lcre235vtolojh4g403ep.apps.googleusercontent.com";
-export const ANTIGRAVITY_CLIENT_SECRET = "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";
+export const ANTIGRAVITY_CLIENT_ID = process.env.ANTIGRAVITY_CLIENT_ID || "1071006060591-tmhssin2h21lcre235vtolojh4g403ep.apps.googleusercontent.com";
+export const ANTIGRAVITY_CLIENT_SECRET = process.env.ANTIGRAVITY_CLIENT_SECRET || "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";
 export const ANTIGRAVITY_REDIRECT_URI = `${BASE_URL}/auth/google/callback`;
 
 export const ANTIGRAVITY_SCOPES = [
